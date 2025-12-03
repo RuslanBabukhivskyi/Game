@@ -1,0 +1,96 @@
+.desktop-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.dock-bar {
+  height: 60px;
+  background: var(--glass);
+  border-top: 1px solid #334155;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+}
+
+.dock-separator {
+  width: 1px;
+  height: 30px;
+  background: #334155;
+  margin: 0 10px;
+}
+
+.dock-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  background: #334155;
+  color: #fff;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dock-icon:hover {
+  transform: translateY(-5px);
+}
+
+.dock-icon.active {
+  background: var(--accent-blue);
+  color: var(--bg-dark);
+  box-shadow: var(--glow-blue);
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 125%; /* Піднімаємо над іконкою (100% висоти + відступ) */
+    left: 50%;
+    transform: translateX(-50%); 
+    
+    background: rgba(15, 23, 42, 0.95); 
+    color: var(--text-main);
+    border: 1px solid #334155;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; 
+    
+    transition: opacity 0.2s ease-in-out;
+    transition-delay: 0s; 
+    z-index: 10000;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #334155 transparent transparent transparent;
+}
+
+.dock-icon:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 1s; 
+}

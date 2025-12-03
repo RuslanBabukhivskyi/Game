@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap');
+
+:root {
+  --bg-dark: #0F172A;
+  --panel-bg: #1E293B;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --accent-blue: #38BDF8;
+  --accent-green: #4ADE80;
+  --accent-red: #F87171;
+  --accent-purple: #C084FC;
+  --code-yellow: #FACC15;
+  --glass: rgba(30, 41, 59, 0.95);
+  --shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-dark);
+  background-image: 
+      linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
+      url('https://www.transparenttextures.com/patterns/circuit-board.png');
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--panel-bg); }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+.glitch-effect {
+  animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}

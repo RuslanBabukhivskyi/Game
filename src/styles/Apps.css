@@ -1,0 +1,190 @@
+/* --- TERMINAL --- */
+.terminal {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.log-error { color: var(--accent-red); }
+.log-success { color: var(--accent-green); }
+.log-info { color: var(--accent-blue); }
+.timestamp { opacity: 0.5; margin-right: 10px; }
+
+/* --- BROWSER --- */
+.browser-bar {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  border-bottom: 1px solid #334155;
+  background: var(--panel-bg);
+  margin: -10px -10px 10px -10px; /* Компенсація паддінгів вікна */
+}
+.url-input {
+  flex: 1;
+  background: var(--bg-dark);
+  border: 1px solid #334155;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono';
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.site-viewport {
+  background: #fff;
+  color: #000;
+  height: 100%;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- SHOP & TASKS & NOTES --- */
+.list-item {
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  transition: all 0.2s;
+}
+.list-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.mission-card {
+  border: 1px solid var(--accent-blue);
+  background: rgba(56, 189, 248, 0.05);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.mission-active {
+  border-color: var(--accent-green);
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: #000;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+}
+.btn-primary:disabled {
+  background: #334155;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/* --- PROFILE --- */
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-white { background: var(--accent-blue); box-shadow: var(--glow-blue); }
+.avatar-black { background: var(--accent-red); box-shadow: var(--glow-red); }
+
+.stats-box {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: left;
+}
+
+.penalty-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Затемнення фону */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50; /* Щоб було поверх списку */
+    backdrop-filter: blur(2px);
+    border-radius: 4px;
+}
+
+@keyframes alert-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.05); 
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.penalty-box {
+  background: #1E293B;
+  border: 2px solid var(--accent-red);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 80%;
+  box-shadow: 0 0 30px rgba(248, 113, 113, 0.3);
+
+  animation: alert-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-danger {
+    background: var(--accent-red);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    flex: 1;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    box-shadow: 0 0 10px var(--accent-red);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid #64748B;
+    color: #94A3B8;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    flex: 1;
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+@keyframes slide-out-right {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+}
+
+.mission-exit {
+    animation: slide-out-right 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+    pointer-events: none; /* Щоб не можна було клікнути під час зникнення */
+}
