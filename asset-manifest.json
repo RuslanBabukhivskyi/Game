@@ -1,17 +1,45 @@
 {
   "files": {
-    "main.css": "/Game/static/css/main.f8e91a04.css",
-    "main.js": "/Game/static/js/main.37e1243c.js",
-    "static/js/453.85428728.chunk.js": "/Game/static/js/453.85428728.chunk.js",
+    "main.css": "/Game/static/css/main.6bb16c05.css",
+    "main.js": "/Game/static/js/main.26f94cc2.js",
+    "static/js/453.12b6d689.chunk.js": "/Game/static/js/453.12b6d689.chunk.js",
+    "static/media/2.png": "/Game/static/media/2.2e3083066c382b6a6a07.png",
+    "static/media/28.png": "/Game/static/media/28.51aae66d7e8d55cd5c53.png",
+    "static/media/1.png": "/Game/static/media/1.178873e1f4b8ef6fdc90.png",
+    "static/media/9.png": "/Game/static/media/9.85bd118bbbd08d7d8477.png",
+    "static/media/20.png": "/Game/static/media/20.3483555fa404e137bef5.png",
+    "static/media/13.png": "/Game/static/media/13.f671031a42cb1ac800e2.png",
+    "static/media/27.png": "/Game/static/media/27.1f84fd55531331a9b362.png",
+    "static/media/15.png": "/Game/static/media/15.3a879d893fc5a847ed66.png",
+    "static/media/12.png": "/Game/static/media/12.a20accfcf46c05c77334.png",
+    "static/media/14.png": "/Game/static/media/14.dfb18a715cb6146f6fd9.png",
+    "static/media/3.png": "/Game/static/media/3.a5720c2d0c0b032fa48f.png",
+    "static/media/8.png": "/Game/static/media/8.fec62740c72edd43b222.png",
+    "static/media/19.png": "/Game/static/media/19.509b8fbeec1743220755.png",
+    "static/media/5.png": "/Game/static/media/5.b3235de2c97d4615432b.png",
+    "static/media/4.png": "/Game/static/media/4.ebb49b9f431116a8044a.png",
+    "static/media/18.png": "/Game/static/media/18.20ddd87278d7053a728f.png",
+    "static/media/11.png": "/Game/static/media/11.d9240c164e493000a538.png",
+    "static/media/24.png": "/Game/static/media/24.3b0a17b116f460047a64.png",
+    "static/media/6.png": "/Game/static/media/6.7fe6d7a4293d16682a30.png",
+    "static/media/25.png": "/Game/static/media/25.877fb57aaa6dfe3e9221.png",
+    "static/media/16.png": "/Game/static/media/16.4b8a7d1cada082da5c70.png",
+    "static/media/21.png": "/Game/static/media/21.6e10714260ed36e1a6ce.png",
+    "static/media/22.png": "/Game/static/media/22.8c60a972cc008e48b07a.png",
+    "static/media/7.png": "/Game/static/media/7.12b9badc1a27be623153.png",
+    "static/media/23.png": "/Game/static/media/23.ae13bb7a62ebdbcc8c08.png",
+    "static/media/26.JPG": "/Game/static/media/26.dbd5e8d254747d3a3163.JPG",
+    "static/media/17.png": "/Game/static/media/17.e08462444264ed052af2.png",
+    "static/media/10.png": "/Game/static/media/10.3911dc7e793640e40ab5.png",
     "static/media/avatar-white.png": "/Game/static/media/avatar-white.f16147375a5d02f23642.png",
     "static/media/avatar-black.png": "/Game/static/media/avatar-black.41826e360ea0d3f1dbf5.png",
     "index.html": "/Game/index.html",
-    "main.f8e91a04.css.map": "/Game/static/css/main.f8e91a04.css.map",
-    "main.37e1243c.js.map": "/Game/static/js/main.37e1243c.js.map",
-    "453.85428728.chunk.js.map": "/Game/static/js/453.85428728.chunk.js.map"
+    "main.6bb16c05.css.map": "/Game/static/css/main.6bb16c05.css.map",
+    "main.26f94cc2.js.map": "/Game/static/js/main.26f94cc2.js.map",
+    "453.12b6d689.chunk.js.map": "/Game/static/js/453.12b6d689.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f8e91a04.css",
-    "static/js/main.37e1243c.js"
+    "static/css/main.6bb16c05.css",
+    "static/js/main.26f94cc2.js"
   ]
 }
