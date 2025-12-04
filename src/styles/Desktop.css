@@ -55,7 +55,7 @@
 
 .tooltip {
     position: absolute;
-    bottom: 125%; /* Піднімаємо над іконкою (100% висоти + відступ) */
+    bottom: 125%; 
     left: 50%;
     transform: translateX(-50%); 
     
@@ -93,4 +93,93 @@
     opacity: 1;
     visibility: visible;
     transition-delay: 1s; 
+}
+
+.role-hud-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    
+    width: 80px; 
+    height: 100px;
+    
+    z-index: 90;
+    pointer-events: none;
+    
+    animation: float 4s ease-in-out infinite;
+}
+.role-hud-indicator img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+    border-radius: 12px;
+    image-rendering: pixelated;
+    
+}
+.role-hud-indicator.role-white img {
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+}
+.role-hud-indicator.role-black img {
+    filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.6));
+}
+
+@keyframes float {
+    0% {
+        transform: rotate(0deg);
+    }
+    50%{
+      transform: rotate(3deg);
+    }
+    100% {
+        transform: rotate(-3deg);
+    }
+}
+
+.mask-message {
+    position: absolute;
+    top: 35px; 
+    right: 110px; 
+    
+    background: rgba(15, 23, 42, 0.95);
+    color: var(--text-main);
+    border: 1px solid var(--accent-blue);
+    padding: 10px 15px;
+    border-radius: 8px 8px 0 8px; 
+    
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    z-index: 95;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    
+    animation: message-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    pointer-events: none;
+}
+
+.mask-message::after {
+    content: '';
+    position: absolute;
+    top: 100%; 
+    right: 0;  
+    
+    width: 0; 
+    height: 0; 
+    border-left: 10px solid transparent;
+    border-top: 10px solid var(--accent-blue);
+}
+
+.role-black ~ .desktop-area .mask-message, 
+.mask-message.msg-danger {
+    border-color: var(--accent-red);
+    color: #fff;
+}
+
+.mask-message.msg-danger::after {
+    border-top-color: var(--accent-red);
+}
+
+@keyframes message-pop {
+    0% { opacity: 0; transform: scale(0.8) translateX(20px); }
+    100% { opacity: 1; transform: scale(1) translateX(0); }
 }

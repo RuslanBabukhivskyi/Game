@@ -13,7 +13,7 @@ const Window = ({ title, children, isOpen, onClose, defaultPos, isActive, onFocu
       bounds="parent"
       dragHandleClassName="window-header"
       onMouseDown={onFocus}
-      style={{ zIndex: isActive ? 100 : 1, display: 'flex', flexDirection: 'column' }} // zIndex залишаємо тут, бо він динамічний
+      style={{ zIndex: isActive ? 100 : 1, display: 'flex', flexDirection: 'column' }} 
     >
       <div className={`window-frame ${isActive ? 'active' : ''}`}>
         

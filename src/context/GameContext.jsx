@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext } from 'react';
-// ПРАВИЛЬНИЙ ІМПОРТ: беремо дані з gameData.js
-import { EXPLOITS } from './gameData';
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
+import { EXPLOITS, WALLPAPERS, getMissions } from './gameData';
+import LevelUpModal from '../components/LevelUpModal';
 
 const GameContext = createContext();
 
@@ -11,11 +11,33 @@ export const GameProvider = ({ children }) => {
   const [xp, setXp] = useState(0);
   
   const [inventory, setInventory] = useState(['sqli_basic']); 
-  const [activeMission, setActiveMission] = useState(null);
-  const [logs, setLogs] = useState([]);
   
+  const [ownedWallpapers, setOwnedWallpapers] = useState(['wp_default']); 
+  const [activeWallpaperId, setActiveWallpaperId] = useState('wp_default'); 
+
+  const [activeMission, setActiveMission] = useState(null);
   const [completedMissionIds, setCompletedMissionIds] = useState([]); 
   const [isMissionCompleting, setIsMissionCompleting] = useState(false);
+  
+  const [logs, setLogs] = useState([]);
+  const [hudText, setHudText] = useState(null); 
+
+  const [showLevelModal, setShowLevelModal] = useState(false);
+  const [levelData, setLevelData] = useState({ old: 1, new: 1, reward: 0 });
+
+  const availableMissionsCount = useMemo(() => {
+      if (!role) return 0;
+      const all = getMissions(role);
+      return all.filter(m => m.minLevel <= level && !completedMissionIds.includes(m.id)).length;
+  }, [role, level, completedMissionIds]);
+
+  useEffect(() => {
+      if (role && availableMissionsCount === 0 && !activeMission) {
+          setHudText("Місій немає. Можна відпочити.");
+      } else if (role && availableMissionsCount > 0 && !activeMission && hudText === "Місій немає. Можна відпочити.") {
+          setHudText(null);
+      }
+  }, [availableMissionsCount, activeMission, role, hudText]);
 
   const addLog = (msg, type = 'normal') => {
     setLogs(prev => [...prev, { msg, type, time: new Date().toLocaleTimeString() }]);
@@ -33,9 +55,8 @@ export const GameProvider = ({ children }) => {
 
     setTimeout(() => {
         setCompletedMissionIds(prev => [...prev, activeMission.id]);
-
         setCoins(prev => prev + activeMission.reward);
-        // XP = 60% від суми нагороди
+        
         const earnedXp = Math.floor(activeMission.reward * 0.6);
         
         setXp(prev => {
@@ -44,11 +65,18 @@ export const GameProvider = ({ children }) => {
             
             if (newXp >= xpThreshold) {
                 const nextLvl = level + 1;
-                setLevel(nextLvl);
-                addLog(`⚡ LEVEL UP! PROMOTED TO LEVEL ${nextLvl}`, 'success');
                 const bonus = 50 * nextLvl;
+
+                setLevelData({ old: level, new: nextLvl, reward: bonus });
+                setShowLevelModal(true);
+
+                setLevel(nextLvl);
                 setCoins(c => c + bonus); 
-                addLog(`+${bonus} HC Level Bonus`, 'info');
+                addLog(`⚡ LEVEL UP! PROMOTED TO LEVEL ${nextLvl}`, 'success');
+                
+                setHudText("З'явилися нові завдання!");
+                setTimeout(() => setHudText(null), 5000);
+
                 return newXp - xpThreshold; 
             }
             return newXp;
@@ -82,16 +110,48 @@ export const GameProvider = ({ children }) => {
     }
   };
 
+  const buyWallpaper = (wpId) => {
+      const wp = WALLPAPERS.find(w => w.id === wpId);
+      if (!wp || ownedWallpapers.includes(wpId)) return;
+
+      if (coins >= wp.price) {
+          setCoins(c => c - wp.price);
+          setOwnedWallpapers(prev => [...prev, wpId]);
+          addLog(`Purchased wallpaper: ${wp.name}`, 'info');
+      } else {
+          addLog(`Not enough HackCoins for ${wp.name}`, 'error');
+      }
+  };
+
+  const equipWallpaper = (wpId) => {
+      if (ownedWallpapers.includes(wpId)) {
+          setActiveWallpaperId(wpId);
+          addLog(`Desktop background updated.`, 'success');
+      }
+  };
+
   return (
     <GameContext.Provider value={{
-      role, selectRole,
-      coins, level, xp,
-      inventory, buyExploit,
+      role, selectRole, coins, level, xp, inventory, 
       activeMission, setActiveMission, completeMission, switchMissionWithPenalty,
-      completedMissionIds, isMissionCompleting,
-      logs, addLog
+      completedMissionIds, isMissionCompleting, logs, addLog,
+      
+      buyExploit, 
+      
+      ownedWallpapers, activeWallpaperId, buyWallpaper, equipWallpaper,
+
+      hudText
     }}>
       {children}
+      
+      {showLevelModal && (
+          <LevelUpModal 
+            oldLevel={levelData.old} 
+            newLevel={levelData.new} 
+            reward={levelData.reward} 
+            onClose={() => setShowLevelModal(false)} 
+          />
+      )}
     </GameContext.Provider>
   );
 };

@@ -1,147 +1,202 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
-import { RotateCw, AlertTriangle } from 'lucide-react';
+import { RotateCw, Lock, User } from 'lucide-react';
 import '../styles/Apps.css';
 
 const Browser = () => {
   const { activeMission, completeMission, addLog } = useGame();
-  const [inputVal, setInputVal] = useState('');
+  
+  const [urlBar, setUrlBar] = useState('');
+  const [formValues, setFormValues] = useState({ username: '', password: '', comment: '', search: '', body: '' });
+  
   const [siteMsg, setSiteMsg] = useState('');
-  const [serverStatus, setServerStatus] = useState(200); // 200, 403, 500
+  const [serverStatus, setServerStatus] = useState(200);
   const [isGlitching, setIsGlitching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const targetUrl = activeMission ? activeMission.targetUrl : 'http://blocked.local';
+  useEffect(() => {
+      if (activeMission) {
+          setUrlBar(activeMission.targetUrl);
+          setFormValues({ username: '', password: '', comment: '', search: '', body: '{ "username": "user", "role": "guest" }' });
+          setSiteMsg('');
+          setServerStatus(200);
+      }
+  }, [activeMission]);
 
   const handleHack = (e) => {
     e.preventDefault();
-    if (!activeMission) {
-        setSiteMsg("ERROR: Connection Refused. No active target.");
-        return;
-    }
+    if (!activeMission) return;
 
     setIsLoading(true);
-    setSiteMsg("Sending packet...");
-    addLog(`[NET] POST ${targetUrl} payload="${inputVal}"`, 'info');
+    setSiteMsg("Processing request...");
 
-    // Симуляція затримки мережі
     setTimeout(() => {
         setIsLoading(false);
+        let isSuccess = false;
+        let payloadForWaf = "";
 
-        // 1. Перевірка: Чи взагалі щось введено?
-        if (!inputVal) {
-            setSiteMsg("Server Error: Empty request body.");
-            setServerStatus(400);
-            return;
+        if (activeMission.type === 'IDOR') {
+            payloadForWaf = urlBar; 
+            addLog(`GET ${urlBar}`, 'info');
+            isSuccess = activeMission.validation(urlBar);
+        } else {
+            payloadForWaf = JSON.stringify(formValues); 
+            addLog(`POST Payload: ${payloadForWaf}`, 'info');
+            isSuccess = activeMission.validation(formValues);
         }
 
-        // 2. ГОЛОВНА ПЕРЕВІРКА: Використовуємо функцію validation з місії
-        // Це дозволяє робити унікальні вимоги для кожної місії
-        const isSuccess = activeMission.validation(inputVal);
+        if (activeMission.waf) {
+            const detected = activeMission.waf.find(word => payloadForWaf.toLowerCase().includes(word.toLowerCase()));
+            if (detected) {
+                setServerStatus(403);
+                setSiteMsg(`🔥 WAF BLOCK: Malicious pattern detected: "${detected}"`);
+                addLog(`[WAF] Blocked attack pattern: ${detected}`, 'error');
+                return;
+            }
+        }
 
         if (isSuccess) {
-            // УСПІХ
             setIsGlitching(true);
             setServerStatus(200);
-            setSiteMsg(`[SYSTEM CRITICAL] Exploitation Successful! Root access granted.`);
-            addLog(`[HACK] Payload accepted. Shell opened.`, 'success');
-            
+            setSiteMsg(`ACCESS GRANTED. Exploitation Successful!`);
+            addLog(`[HACK] System compromised.`, 'success');
             setTimeout(() => {
                 completeMission();
                 setIsGlitching(false);
                 setSiteMsg("");
-                setInputVal("");
-            }, 2000);
-
+            }, 1500);
         } else {
-            // НЕВДАЧА - даємо гравцю підказку чому
-            setServerStatus(500); // Internal Server Error
-            
-            // Розумні повідомлення про помилку
-            if (activeMission.type === 'SQL_INJECTION' && !inputVal.includes("'")) {
-                setSiteMsg("DB Error: Syntax looks normal. Try breaking the query string.");
-            } else if (activeMission.type === 'XSS' && !inputVal.includes("<script>")) {
-                setSiteMsg("WAF: No executable script detected.");
-            } else {
-                setSiteMsg("Server Response: 403 Forbidden. Payload ineffective.");
-            }
-            
-            addLog(`[FAIL] Target rejected payload.`, 'error');
+            setServerStatus(500);
+            if (activeMission.type === 'IDOR') setSiteMsg("404 Not Found (User ID valid or generic error)");
+            else setSiteMsg("Invalid Credentials / Payload Failed");
+            addLog(`[FAIL] Server rejected request.`, 'error');
         }
     }, 800);
   };
 
+  const handleInput = (field, value) => {
+      setFormValues(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (!activeMission) return (
+      <div className="site-viewport" style={{display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'#666'}}>
+          <Lock size={48} style={{marginBottom:10}}/>
+          <h3>Secure Connection Closed</h3>
+          <p>Select a mission to establish target connection.</p>
+      </div>
+  );
+
+  const hasBg = !!activeMission.bgImage;
+  
+  const browserBodyStyle = hasBg ? {
+      backgroundImage: `url(${activeMission.bgImage})`,
+      backgroundSize: 'cover',        
+      backgroundPosition: 'center',   
+      backgroundRepeat: 'no-repeat'   
+  } : {};
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }} className={isGlitching ? 'glitch-effect' : ''}>
-      {/* Адресний рядок */}
+      
       <div className="browser-bar">
-        <RotateCw size={16} color={isLoading ? "var(--code-yellow)" : "var(--accent-blue)"} className={isLoading ? "spin" : ""} />
-        <input className="url-input" value={targetUrl} readOnly />
+        <RotateCw size={16} className={isLoading ? "spin" : ""} color="var(--accent-blue)"/>
+        <input 
+            className="url-input" 
+            value={urlBar}
+            onChange={(e) => setUrlBar(e.target.value)}
+            style={activeMission.type === 'IDOR' ? {border: '1px solid var(--code-yellow)', color: '#fff'} : {}}
+        />
+        {activeMission.type === 'IDOR' && <button onClick={handleHack} className="btn-go">GO</button>}
       </div>
 
-      {/* Вікно сайту */}
-      <div className="site-viewport" style={{ 
-          background: serverStatus === 200 ? '#fff' : '#f8d7da', // Червонуватий фон при помилці
-          transition: 'background 0.3s'
-      }}>
-        {!activeMission ? (
-            <div style={{textAlign: 'center', opacity: 0.5}}>
-                <AlertTriangle size={48} style={{margin: '0 auto 10px'}}/>
-                <h3>Secure Gateway</h3>
-                <p>No active connection established.</p>
-            </div>
-        ) : (
-            <>
-                <div style={{textAlign: 'center', marginBottom: '20px'}}>
-                    <h2 style={{ color: '#000' }}>{activeMission.title} Login</h2>
-                    <p style={{ fontSize: '12px', color: '#666' }}>Secure Enterprise Server v4.0</p>
-                </div>
-                
-                <form onSubmit={handleHack} style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '280px' }}>
-                  {/* Симуляція різних полів залежно від місії */}
-                  {activeMission.type === 'IDOR' ? (
-                       <div style={{display: 'flex', alignItems: 'center', background: '#eee', padding: '5px', borderRadius: '4px', border: '1px solid #ccc'}}>
-                           <span style={{color: '#666', fontSize: '12px', marginRight: '5px'}}>http://site/profile</span>
-                           <input 
-                                type="text" 
-                                placeholder="?id=..." 
-                                className="url-input"
-                                style={{ background: 'transparent', border: 'none', color: '#000', padding: 0 }} 
-                                value={inputVal} onChange={(e) => setInputVal(e.target.value)}
-                           />
-                       </div>
-                  ) : (
-                      <input 
-                        type="text" 
-                        placeholder={activeMission.type === 'XSS' ? "Leave a comment..." : "Username / Command"} 
-                        className="url-input"
-                        style={{ background: '#fff', border: '1px solid #ccc', color: '#000', padding: '12px' }} 
-                        value={inputVal} onChange={(e) => setInputVal(e.target.value)}
-                      />
-                  )}
-                  
-                  <button type="submit" className="btn-primary" disabled={isLoading}>
-                    {isLoading ? "SENDING..." : "INJECT PAYLOAD"}
-                  </button>
-                </form>
+      <div 
+        className="site-viewport" 
+        key={activeMission.id} 
+        style={{ 
+          ...browserBodyStyle,
+          backgroundColor: hasBg ? 'transparent' : (serverStatus === 200 ? '#fff' : '#fff0f0') 
+        }}
+      >
 
-                {siteMsg && (
-                    <div style={{ 
-                        marginTop: '20px', 
-                        padding: '10px', 
-                        borderRadius: '4px',
-                        background: serverStatus === 200 ? 'rgba(0,128,0,0.1)' : 'rgba(255,0,0,0.1)',
-                        color: serverStatus === 200 ? 'green' : '#721c24',
-                        border: serverStatus === 200 ? '1px solid green' : '1px solid #f5c6cb',
-                        width: '90%',
-                        fontSize: '12px',
-                        fontFamily: 'JetBrains Mono'
+        <div className={hasBg ? 'browser-glass-content' : ''}>
+        
+            {activeMission.uiType === 'LOGIN' && (
+                <div style={{width: '250px', margin: '0 auto', textAlign: 'center'}}>
+                    <h2 style={{color: hasBg ? '#fff' : '#333', textShadow: hasBg ? '0 2px 4px rgba(0,0,0,0.8)' : 'none'}}>
+                        {activeMission.title}
+                    </h2>
+                    
+                    <div style={{
+                        background: hasBg ? 'rgba(255,255,255,0.1)' : '#f4f4f4',
+                        padding: '20px', borderRadius: '8px', 
+                        border: hasBg ? '1px solid rgba(255,255,255,0.2)' : '1px solid #ddd'
                     }}>
-                        <strong> SERVER_LOG:</strong> {siteMsg}
+                        <User size={32} color={hasBg ? "#fff" : "#555"} style={{marginBottom: '15px'}}/>
+                        <form onSubmit={handleHack} style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+                            <input type="text" placeholder="Username" className="site-input" 
+                                value={formValues.username} onChange={e => handleInput('username', e.target.value)}/>
+                            <input type="password" placeholder="Password" className="site-input" 
+                                value={formValues.password} onChange={e => handleInput('password', e.target.value)}/>
+                            <button type="submit" className="btn-primary" disabled={isLoading}>LOGIN</button>
+                        </form>
                     </div>
-                )}
-            </>
-        )}
+                </div>
+            )}
+
+            {activeMission.uiType === 'COMMENTS' && (
+                <div style={{width: '90%', margin: '0 auto'}}>
+                    <h2 style={{color: '#333', borderBottom: '2px solid var(--accent-blue)'}}>News Feed</h2>
+                    <div style={{marginBottom: '20px', color: '#555'}}>
+                        <h3>Local Cat Wins Lottery</h3>
+                        <p>Residents shocked as Mr. Whiskers buys a boat...</p>
+                    </div>
+                    <div style={{background: '#f9f9f9', padding: '15px', border: '1px solid #eee'}}>
+                        <h4>Leave a Reply</h4>
+                        <form onSubmit={handleHack}>
+                            <textarea placeholder="Write your comment..." className="site-input" style={{height: '80px', marginBottom: '10px', width: '100%'}}
+                                    value={formValues.comment} onChange={e => handleInput('comment', e.target.value)}/>
+                            <button type="submit" className="btn-primary" disabled={isLoading}>POST COMMENT</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {activeMission.uiType === 'JSON' && (
+                <div style={{width: '90%', height: '80%', display: 'flex', flexDirection: 'column'}}>
+                    <h3 style={{color: '#333'}}>API Debugger v1.0</h3>
+                    <form onSubmit={handleHack} style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+                        <textarea className="site-input" 
+                                style={{flex: 1, fontFamily: 'monospace', background: '#282c34', color: '#abb2bf', border: 'none', padding: '15px'}}
+                                value={formValues.body} onChange={e => handleInput('body', e.target.value)}/>
+                        <button type="submit" className="btn-primary" style={{marginTop: '10px'}} disabled={isLoading}>SEND REQUEST</button>
+                    </form>
+                </div>
+            )}
+
+            {activeMission.uiType === 'STATIC' && (
+                <div style={{textAlign: 'center', marginTop: '50px'}}>
+                    <h1>📄 Booking Details</h1>
+                    <p style={{fontSize: '18px', color: '#555'}}>Reservation ID: <strong>{urlBar.split('=')[1] || '???'}</strong></p>
+                    <div style={{margin: '20px auto', padding: '20px', border: '1px dashed #ccc', width: '200px'}}>
+                        (User Data Placeholder)
+                    </div>
+                    <p style={{color: '#888', fontSize: '12px'}}>Edit URL in the address bar above to view other records.</p>
+                </div>
+            )}
+
+            {siteMsg && (
+                <div style={{ 
+                    marginTop: '20px', padding: '10px', width: '90%', margin: '20px auto',
+                    color: serverStatus === 200 ? 'green' : '#d32f2f', 
+                    background: serverStatus === 200 ? '#e8f5e9' : '#ffebee',
+                    border: `1px solid ${serverStatus === 200 ? 'green' : '#d32f2f'}`, 
+                    fontSize: '12px', fontFamily: 'JetBrains Mono' 
+                }}>
+                    <strong>SERVER_RESPONSE:</strong> {siteMsg}
+                </div>
+            )}
+        
+        </div>
       </div>
     </div>
   );

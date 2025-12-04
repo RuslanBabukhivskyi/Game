@@ -1,4 +1,3 @@
-/* --- TERMINAL --- */
 .terminal {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
@@ -9,14 +8,13 @@
 .log-info { color: var(--accent-blue); }
 .timestamp { opacity: 0.5; margin-right: 10px; }
 
-/* --- BROWSER --- */
 .browser-bar {
   display: flex;
   gap: 10px;
   padding: 8px;
   border-bottom: 1px solid #334155;
   background: var(--panel-bg);
-  margin: -10px -10px 10px -10px; /* Компенсація паддінгів вікна */
+  margin: -10px -10px 10px -10px; 
 }
 .url-input {
   flex: 1;
@@ -79,7 +77,6 @@
   cursor: not-allowed;
 }
 
-/* --- PROFILE --- */
 .profile-avatar {
   width: 80px;
   height: 80px;
@@ -105,11 +102,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8); /* Затемнення фону */
+    background: rgba(0, 0, 0, 0.8); 
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 50; /* Щоб було поверх списку */
+    z-index: 50;
     backdrop-filter: blur(2px);
     border-radius: 4px;
 }
@@ -186,5 +183,190 @@
 
 .mission-exit {
     animation: slide-out-right 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
-    pointer-events: none; /* Щоб не можна було клікнути під час зникнення */
+    pointer-events: none;
+}
+
+.btn-go {
+    background: var(--accent-green);
+    color: #000;
+    border: none;
+    padding: 0 10px;
+    margin-left: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.btn-go:hover { opacity: 0.9; }
+
+.site-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.site-input:focus {
+    outline: 2px solid var(--accent-blue);
+    border-color: transparent;
+}
+
+.wiki-content h3 {
+    color: var(--text-main);
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.wiki-content h4 {
+    color: var(--code-yellow);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.wiki-content p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+}
+
+.wiki-content strong {
+    color: var(--text-main);
+}
+
+.wiki-content .code-block {
+    background: #000;
+    border: 1px solid #334155;
+    border-left: 3px solid var(--accent-green);
+    padding: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-green);
+    font-size: 12px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.wiki-content code {
+    background: rgba(255,255,255,0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--code-yellow);
+}
+
+.levelup-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+}
+
+.levelup-box {
+    background: #0F172A;
+    border: 2px solid var(--accent-green);
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(74, 222, 128, 0.2);
+    animation: alert-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 350px;
+    
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    
+    gap: 25px;            
+}
+
+.levelup-title {
+    color: var(--accent-green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    margin: 0; 
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(74, 222, 128, 0.6);
+}
+
+.levelup-levels {
+    font-size: 22px;
+    display: flex; justify-content: center; gap: 15px; align-items: center;
+    color: var(--text-muted);
+}
+
+.lvl-new {
+    color: var(--text-main);
+    font-weight: bold;
+    transform: scale(1.2);
+    text-shadow: 0 0 10px #fff;
+}
+
+.levelup-reward {
+    font-size: 16px;
+    border: 1px solid var(--code-yellow);
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: rgba(250, 204, 21, 0.1);
+    color: var(--text-main);
+    font-weight: bold;
+    
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.levelup-reward:hover {
+    background: rgba(250, 204, 21, 0.2);
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
+    transform: translateY(-2px);
+}
+
+.levelup-btn {
+    background: #58f838;
+    color: #000;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    width: 100%; 
+    
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.levelup-btn:hover {
+    transform: scale(1.05); 
+    background: #58f838;   
+    box-shadow: 0 0 20px rgba(56, 248, 88, 0.6); 
+    color: #000000;
+}
+
+.levelup-btn:active {
+    transform: scale(0.95); 
+}
+
+.browser-glass-content {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);      
+    -webkit-backdrop-filter: blur(8px);
+    
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    
+    max-width: 400px;
+    margin: 40px auto; 
+}
+
+.browser-glass-content h2, 
+.browser-glass-content p,
+.browser-glass-content label {
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
