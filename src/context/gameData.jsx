@@ -221,7 +221,7 @@ export const getMissions = (role) => [
         validation: (url) => url.includes("?file_id=") && !url.includes("50"),
         employer: role === 'white' ? "MyCloud Storage" : "Leaker_Pro",
         title: "Хмарне Сховище",
-        desc: role === 'white' ? "Приватні файли користувачів мають передбачувані ID." : "Знайди інтимні фото в хмарі. Почни перебір.",
+        desc: role === 'white' ? "Приватні файли користувачів мають передбачувані ID." : "Знайди фото кокретної людини в хмарі. Почни перебір.",
         hint: "Зміни ?file_id=50", targetUrl: "http://mycloud.local/preview?file_id=50", img: "☁️"
     },
 

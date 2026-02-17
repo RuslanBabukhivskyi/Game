@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
-import { RotateCw, Lock, User } from 'lucide-react';
+import { EXPLOITS } from '../context/gameData'; 
+import { RotateCw, Lock, User, Terminal, ChevronRight } from 'lucide-react'; 
 import '../styles/Apps.css';
 
 const Browser = () => {
-  const { activeMission, completeMission, addLog } = useGame();
+  const { activeMission, completeMission, addLog, inventory } = useGame(); 
   
   const [urlBar, setUrlBar] = useState('');
   const [formValues, setFormValues] = useState({ username: '', password: '', comment: '', search: '', body: '' });
@@ -14,6 +15,9 @@ const Browser = () => {
   const [isGlitching, setIsGlitching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [showTools, setShowTools] = useState(false);
+  const toolsRef = useRef(null);
+
   useEffect(() => {
       if (activeMission) {
           setUrlBar(activeMission.targetUrl);
@@ -22,6 +26,36 @@ const Browser = () => {
           setServerStatus(200);
       }
   }, [activeMission]);
+
+  useEffect(() => {
+      const handleClickOutside = (event) => {
+          if (toolsRef.current && !toolsRef.current.contains(event.target)) {
+              setShowTools(false);
+          }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  const typePayload = (payload, fieldName) => {
+      setShowTools(false); 
+      let i = 0;
+      const speed = 30; 
+      
+      setFormValues(prev => ({ ...prev, [fieldName]: '' }));
+
+      const interval = setInterval(() => {
+          setFormValues(prev => {
+              const currentVal = prev[fieldName] || '';
+              if (currentVal.length >= payload.length) {
+                  clearInterval(interval);
+                  return prev;
+              }
+              return { ...prev, [fieldName]: payload.substring(0, i + 1) };
+          });
+          i++;
+          if (i >= payload.length) clearInterval(interval);
+      }, speed);
+  };
 
   const handleHack = (e) => {
     e.preventDefault();
@@ -78,6 +112,10 @@ const Browser = () => {
       setFormValues(prev => ({ ...prev, [field]: value }));
   };
 
+  // Фільтруємо інструменти: показуємо тільки ті, що є в інвентарі
+  // і (опціонально) підходять під тип місії, хоча можна показувати всі для складності
+  const myExploits = EXPLOITS.filter(e => inventory.includes(e.id));
+
   if (!activeMission) return (
       <div className="site-viewport" style={{display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'#666'}}>
           <Lock size={48} style={{marginBottom:10}}/>
@@ -87,12 +125,11 @@ const Browser = () => {
   );
 
   const hasBg = !!activeMission.bgImage;
-  
   const browserBodyStyle = hasBg ? {
       backgroundImage: `url(${activeMission.bgImage})`,
-      backgroundSize: 'cover',        
-      backgroundPosition: 'center',   
-      backgroundRepeat: 'no-repeat'   
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
   } : {};
 
   return (
@@ -112,14 +149,54 @@ const Browser = () => {
       <div 
         className="site-viewport" 
         key={activeMission.id} 
-        style={{ 
-          ...browserBodyStyle,
-          backgroundColor: hasBg ? 'transparent' : (serverStatus === 200 ? '#fff' : '#fff0f0') 
-        }}
+        style={{ ...browserBodyStyle, backgroundColor: hasBg ? 'transparent' : (serverStatus === 200 ? '#fff' : '#fff0f0') }}
       >
-
         <div className={hasBg ? 'browser-glass-content' : ''}>
         
+            {/* === HELPER: TOOLBAR BUTTON (Кнопка інструментів) === */}
+            {/* Вона з'являється тільки якщо це не IDOR (бо IDOR в URL рядку) */}
+            {activeMission.uiType !== 'STATIC' && (
+                <div className="hacker-toolbar-container" ref={toolsRef}>
+                    <button 
+                        className="btn-hacker-tools" 
+                        onClick={() => setShowTools(!showTools)}
+                        title="Inject Payload"
+                    >
+                        <Terminal size={14} /> PAYLOADS
+                    </button>
+
+                    {showTools && (
+                        <div className="hacker-tools-dropdown">
+                            <div className="tools-header">OWNED EXPLOITS</div>
+                            {myExploits.length === 0 ? (
+                                <div className="tool-item empty">Inventory empty</div>
+                            ) : (
+                                myExploits.map(exploit => (
+                                    <div 
+                                        key={exploit.id} 
+                                        className="tool-item"
+                                        onClick={() => {
+                                            // Визначаємо, в яке поле друкувати, залежно від типу місії
+                                            let targetField = 'username'; // Default for Login
+                                            if (activeMission.uiType === 'COMMENTS') targetField = 'comment';
+                                            if (activeMission.uiType === 'JSON') targetField = 'body';
+                                            
+                                            typePayload(exploit.code, targetField);
+                                        }}
+                                    >
+                                        <ChevronRight size={12} />
+                                        <span>{exploit.name}</span>
+                                    </div>
+                                ))
+                            )}
+                            <div className="tools-footer">Buy more in Shop</div>
+                        </div>
+                    )}
+                </div>
+            )}
+            {/* ================================================= */}
+
+            {/* === UI ТИП: LOGIN === */}
             {activeMission.uiType === 'LOGIN' && (
                 <div style={{width: '250px', margin: '0 auto', textAlign: 'center'}}>
                     <h2 style={{color: hasBg ? '#fff' : '#333', textShadow: hasBg ? '0 2px 4px rgba(0,0,0,0.8)' : 'none'}}>
@@ -143,15 +220,16 @@ const Browser = () => {
                 </div>
             )}
 
+            {/* === UI ТИП: COMMENTS === */}
             {activeMission.uiType === 'COMMENTS' && (
                 <div style={{width: '90%', margin: '0 auto'}}>
-                    <h2 style={{color: '#333', borderBottom: '2px solid var(--accent-blue)'}}>News Feed</h2>
-                    <div style={{marginBottom: '20px', color: '#555'}}>
+                    <h2 style={{color: '#fff', borderBottom: '2px solid var(--accent-blue)', textShadow: '0 2px 4px rgba(0,0,0,0.8)'}}>News Feed</h2>
+                    <div style={{marginBottom: '20px', color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.8)'}}>
                         <h3>Local Cat Wins Lottery</h3>
                         <p>Residents shocked as Mr. Whiskers buys a boat...</p>
                     </div>
-                    <div style={{background: '#f9f9f9', padding: '15px', border: '1px solid #eee'}}>
-                        <h4>Leave a Reply</h4>
+                    <div style={{padding: '15px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', color: '#fff'}}>
+                        <h4 style={{textShadow: '0 1px 2px rgba(0,0,0,0.8)'}}>Leave a Reply</h4>
                         <form onSubmit={handleHack}>
                             <textarea placeholder="Write your comment..." className="site-input" style={{height: '80px', marginBottom: '10px', width: '100%'}}
                                     value={formValues.comment} onChange={e => handleInput('comment', e.target.value)}/>
@@ -161,9 +239,10 @@ const Browser = () => {
                 </div>
             )}
 
+            {/* === UI ТИП: JSON API === */}
             {activeMission.uiType === 'JSON' && (
                 <div style={{width: '90%', height: '80%', display: 'flex', flexDirection: 'column'}}>
-                    <h3 style={{color: '#333'}}>API Debugger v1.0</h3>
+                    <h3>API Debugger v1.0</h3>
                     <form onSubmit={handleHack} style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
                         <textarea className="site-input" 
                                 style={{flex: 1, fontFamily: 'monospace', background: '#282c34', color: '#abb2bf', border: 'none', padding: '15px'}}
@@ -173,14 +252,15 @@ const Browser = () => {
                 </div>
             )}
 
+            {/* === UI ТИП: STATIC === */}
             {activeMission.uiType === 'STATIC' && (
                 <div style={{textAlign: 'center', marginTop: '50px'}}>
-                    <h1>📄 Booking Details</h1>
-                    <p style={{fontSize: '18px', color: '#555'}}>Reservation ID: <strong>{urlBar.split('=')[1] || '???'}</strong></p>
-                    <div style={{margin: '20px auto', padding: '20px', border: '1px dashed #ccc', width: '200px'}}>
+                    <h1 style={{color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.8)'}}>📄 Booking Details</h1>
+                    <p style={{fontSize: '18px', color: '#fff', textShadow: '0 1px 2px rgba(0,0,0,0.8)'}}>Reservation ID: <strong>{urlBar.split('=')[1] || '???'}</strong></p>
+                    <div style={{margin: '20px auto', padding: '20px', border: '1px dashed rgba(255,255,255,0.5)', width: '200px', color: '#fff'}}>
                         (User Data Placeholder)
                     </div>
-                    <p style={{color: '#888', fontSize: '12px'}}>Edit URL in the address bar above to view other records.</p>
+                    <p style={{color: '#ccc', fontSize: '12px'}}>Edit URL in the address bar above to view other records.</p>
                 </div>
             )}
 

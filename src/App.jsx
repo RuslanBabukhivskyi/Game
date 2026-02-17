@@ -5,27 +5,34 @@ import { WALLPAPERS } from './context/gameData';
 import LoginScreen from './components/LoginScreen';
 import Window from './components/Window';
 
+// Імпорт програм (Без Notes)
 import Browser from './apps/Browser';
 import Terminal from './apps/Terminal';
-import Notes from './apps/Notes';
 import Tasks from './apps/Tasks';
 import Shop from './apps/Shop';
 import Profile from './apps/Profile';
 import Handbook from './apps/Handbook';
 
-import { Monitor, Globe, FileText, CheckSquare, ShoppingCart, User, BookOpen } from 'lucide-react';
+// Прибрав FileText з імпортів
+import { Monitor, Globe, CheckSquare, ShoppingCart, User, BookOpen } from 'lucide-react';
 import './styles/Theme.css';
 import './styles/Desktop.css';
 
+// Картинки масок
 import whiteMaskIcon from './assets/avatar-white.png';
 import blackMaskIcon from './assets/avatar-black.png';
 
 const Desktop = () => {
   const { role, activeWallpaperId, hudText } = useGame();
   
+  // Прибрав notes зі стану
   const [windows, setWindows] = useState({
-    tasks: true, browser: true, terminal: true, notes: true,
-    shop: false, profile: false, handbook: false
+    tasks: true, 
+    browser: true, 
+    terminal: true, 
+    shop: false, 
+    profile: false, 
+    handbook: false
   });
   
   const [activeWindow, setActiveWindow] = useState('browser');
@@ -85,9 +92,7 @@ const Desktop = () => {
         <Window title="CyberFox Browser" isOpen={windows.browser} onClose={() => toggleWindow('browser')} isActive={activeWindow === 'browser'} onFocus={() => focusWindow('browser')} defaultPos={{ x: 340, y: 20, width: 600, height: 450 }}>
           <Browser />
         </Window>
-        <Window title="Hacker Notes" isOpen={windows.notes} onClose={() => toggleWindow('notes')} isActive={activeWindow === 'notes'} onFocus={() => focusWindow('notes')} defaultPos={{ x: 960, y: 20, width: 280, height: 350 }}>
-          <Notes />
-        </Window>
+        {/* Вікно Notes видалено */}
         <Window title="DarkNet Shop" isOpen={windows.shop} onClose={() => toggleWindow('shop')} isActive={activeWindow === 'shop'} onFocus={() => focusWindow('shop')} defaultPos={{ x: 340, y: 100, width: 300, height: 400 }}>
           <Shop />
         </Window>
@@ -106,7 +111,7 @@ const Desktop = () => {
         <DockIcon icon={<CheckSquare size={20}/>} onClick={() => toggleWindow('tasks')} active={windows.tasks} label="Tasks" />
         <DockIcon icon={<Globe size={20}/>} onClick={() => toggleWindow('browser')} active={windows.browser} label="Browser" />
         <DockIcon icon={<Monitor size={20}/>} onClick={() => toggleWindow('terminal')} active={windows.terminal} label="Terminal" />
-        <DockIcon icon={<FileText size={20}/>} onClick={() => toggleWindow('notes')} active={windows.notes} label="Notes" />
+        {/* Іконку Notes видалено */}
         <DockIcon icon={<BookOpen size={20}/>} onClick={() => toggleWindow('handbook')} active={windows.handbook} label="Handbook" />
         
         <div className="dock-separator"></div>

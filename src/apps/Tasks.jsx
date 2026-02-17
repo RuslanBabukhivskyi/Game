@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { getMissions } from '../context/gameData';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react'; 
 import '../styles/Apps.css';
 
 const shuffleArray = (array) => {
@@ -66,16 +66,15 @@ const Tasks = () => {
       {/* Активна місія */}
       {activeMission && (
         <div className={`mission-card mission-active ${isMissionCompleting ? 'mission-exit' : ''}`}>
+            {/* <--- ЗМІНЕНО: Прибрано блок з HINT */}
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
                 <div>
                     <h4 style={{ color: 'var(--accent-green)', margin: '0 0 5px 0' }}>ACTIVE MISSION</h4>
                     <b>{activeMission.title}</b>
                 </div>
-                <div className="hint-icon-container">
-                    <Info size={18} color="var(--code-yellow)" style={{cursor: 'help'}} />
-                    <div className="hint-tooltip"><strong>HINT:</strong><br/>{activeMission.hint}</div>
-                </div>
+                {/* Тут раніше була іконка Info з підказкою. Тепер її немає. */}
             </div>
+            
             <p style={{ fontSize: '12px', margin: '10px 0' }}>{activeMission.desc}</p>
         </div>
       )}
